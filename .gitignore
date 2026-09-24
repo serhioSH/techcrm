@@ -1,0 +1,57 @@
+﻿# POS Comidas Rapidas — .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+*.spec
+
+# Entorno virtual
+venv/
+.venv/
+env/
+.env
+
+# Base de datos (no versionar datos reales)
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Backups
+backups/*.db
+backups/*.zip
+
+# Reportes generados
+reportes/*.xlsx
+
+# Comprobantes generados
+comprobantes/*.pdf
+comprobantes/*.txt
+
+# Logs
+logs/*.log
+
+# Configuracion sensible
+configuracion/settings.json
+
+# PyInstaller
+*.spec
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini

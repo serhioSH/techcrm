@@ -1,0 +1,17 @@
+   TECHCRM - Comidas Rápidas    
+--------------------------------
+Comprobante: #5
+Fecha: 2026-09-22
+Hora:  17:45:40
+Mesa:  Mesa 2
+Cajero:Administrador
+--------------------------------
+Producto      Cant Precio    Sub
+--------------------------------
+Limonada Natu    3   6000  18000
+--------------------------------
+              TOTAL $      18000
+               Pago:   EFECTIVO
+--------------------------------
+    ¡Gracias por su visita!     
+

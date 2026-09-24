@@ -1,0 +1,20 @@
+        Comidas El Punto        
+        NIT: 900123456-1        
+        Calle 10 # 5-25         
+        Tel: 3216549870         
+--------------------------------
+Comprobante: #1
+Fecha: 2026-09-19
+Hora:  16:14:14
+Mesa:  Barra
+Cajero:Administrador
+--------------------------------
+Producto      Cant Precio    Sub
+--------------------------------
+Agua Botella     1   2500   2500
+--------------------------------
+              TOTAL $       2500
+               Pago:   EFECTIVO
+--------------------------------
+        ¡Vuelva pronto!         
+

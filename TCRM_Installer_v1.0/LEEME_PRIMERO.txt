@@ -1,0 +1,104 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║                          BIENVENIDO A TCRM v1.0                           ║
+║              Sistema POS Profesional para Comidas Rápidas                 ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+🎯 ¿QUÉ ES TCRM?
+
+TCRM es un sistema profesional de Punto de Venta (POS) diseñado específicamente 
+para restaurantes y comidas rápidas en Colombia. Permite:
+
+  ✓ Gestionar mesas y pedidos en tiempo real
+  ✓ Administrar inventario de productos
+  ✓ Procesar pagos y caja
+  ✓ Generar reportes de ventas
+  ✓ Imprimir tickets de cocina
+  ✓ Gestionar usuarios con diferentes permisos
+
+
+⚡ REQUISITOS DEL SISTEMA
+
+  • Windows 10 o superior (64 bits recomendado)
+  • Mínimo 500 MB de espacio libre en disco
+  • Permisos de administrador para la instalación
+
+
+📥 INSTALACIÓN RÁPIDA
+
+1. Haz doble clic en "INSTALAR_TCRM.bat"
+
+2. Si se pide permiso de administrador, HAZ CLIC EN "SÍ"
+
+3. El instalador:
+   - Copiará TCRM a C:\Program Files\TCRM
+   - Creará un acceso directo en tu escritorio
+   - Agregará TCRM al menú de inicio
+   - Registrará la aplicación en Windows
+
+4. Una vez completada la instalación, podrás:
+   - Buscar "TCRM" en el menú de inicio
+   - Usar el acceso directo en el escritorio
+   - Desinstalar desde Panel de Control
+
+
+🔑 CREDENCIALES POR DEFECTO
+
+Usuario: techcrm
+Contraseña: 1234567
+
+⚠️  IMPORTANTE: Cambia la contraseña en tu primera sesión
+
+
+🖥️  PRIMEROS PASOS
+
+1. Inicia TCRM
+2. Usa las credenciales anteriores
+3. Ve a Configuración → Identidad para:
+   - Cambiar nombre del negocio
+   - Cambiar tu contraseña
+   - Configurar datos de impresora
+
+
+🐛 ¿PROBLEMAS?
+
+Si encuentras algún problema:
+
+1. Asegúrate de tener Windows 10 o superior
+2. Ejecuta el instalador con permisos de administrador (clic derecho → Ejecutar como administrador)
+3. Revisa que tengas al menos 500 MB libres en C:\
+
+
+📞 SOPORTE
+
+Para reportar problemas o sugerencias, documenta:
+- Tu versión de Windows
+- Paso donde falló
+- Mensaje de error exacto (si lo hay)
+
+
+🔄 DESINSTALACIÓN
+
+Para desinstalar TCRM:
+
+Opción 1: Panel de Control
+  Panel de Control → Programas → Programas y características
+  Busca "TCRM - Sistema POS" y haz clic en "Desinstalar"
+
+Opción 2: Carpeta de instalación
+  C:\Program Files\TCRM\Desinstalar_TCRM.bat
+
+
+📚 DOCUMENTACIÓN ADICIONAL
+
+- START_HERE.txt: Guía de inicio rápido en inglés
+- INSTALACION_TCRM.md: Documentación técnica de instalación
+- TCRM_RELEASE_NOTES.md: Cambios y mejoras de esta versión
+
+
+🎉 ¡LISTO PARA USAR!
+
+Ahora ejecuta "INSTALAR_TCRM.bat" para comenzar.
+
+═══════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,104 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║                         WELCOME TO TCRM v1.0                              ║
+║              Professional POS System for Quick Service Restaurants        ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+🎯 WHAT IS TCRM?
+
+TCRM is a professional Point of Sale (POS) system designed specifically for 
+restaurants and quick-service establishments. It enables:
+
+  ✓ Manage tables and orders in real-time
+  ✓ Inventory management
+  ✓ Payment processing and cash management
+  ✓ Sales reporting and analytics
+  ✓ Kitchen ticket printing
+  ✓ User management with role-based permissions
+
+
+⚡ SYSTEM REQUIREMENTS
+
+  • Windows 10 or later (64-bit recommended)
+  • Minimum 500 MB free disk space
+  • Administrator privileges required for installation
+
+
+📥 QUICK INSTALLATION
+
+1. Double-click "INSTALAR_TCRM.bat"
+
+2. If prompted for administrator permission, click "YES"
+
+3. The installer will:
+   - Copy TCRM to C:\Program Files\TCRM
+   - Create a desktop shortcut
+   - Add TCRM to your Start menu
+   - Register the application with Windows
+
+4. Once installation completes, you can:
+   - Search for "TCRM" in the Start menu
+   - Use the desktop shortcut
+   - Uninstall via Control Panel
+
+
+🔑 DEFAULT CREDENTIALS
+
+Username: techcrm
+Password: 1234567
+
+⚠️  IMPORTANT: Change your password on first login
+
+
+🖥️  GETTING STARTED
+
+1. Launch TCRM
+2. Use the credentials above
+3. Go to Settings → Identity to:
+   - Update your business name
+   - Change your password
+   - Configure printer settings
+
+
+🐛 TROUBLESHOOTING
+
+If you encounter issues:
+
+1. Verify you're running Windows 10 or later
+2. Run the installer with administrator rights (right-click → Run as administrator)
+3. Ensure you have at least 500 MB free space on C:\
+
+
+📞 SUPPORT
+
+When reporting issues, please provide:
+- Your Windows version
+- The step where the failure occurred
+- Exact error message (if any)
+
+
+🔄 UNINSTALLATION
+
+To remove TCRM:
+
+Option 1: Control Panel
+  Control Panel → Programs → Programs and Features
+  Find "TCRM - Sistema POS" and click "Uninstall"
+
+Option 2: Installation Folder
+  C:\Program Files\TCRM\Desinstalar_TCRM.bat
+
+
+📚 ADDITIONAL DOCUMENTATION
+
+- LEEME_PRIMERO.txt: Quick start guide in Spanish
+- INSTALACION_TCRM.md: Technical installation documentation
+- TCRM_RELEASE_NOTES.md: Release notes and improvements
+
+
+🎉 READY TO START!
+
+Now run "INSTALAR_TCRM.bat" to begin.
+
+═══════════════════════════════════════════════════════════════════════════════

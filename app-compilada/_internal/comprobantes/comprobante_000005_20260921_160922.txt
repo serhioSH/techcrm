@@ -1,0 +1,21 @@
+             Mi Negocio de Comidas              
+------------------------------------------------
+Comprobante: #5
+Fecha: 2026-09-21
+Hora:  16:09:22
+Mesa:  Mesa 1
+Cajero:Administrador
+------------------------------------------------
+Producto                      Cant Precio    Sub
+------------------------------------------------
+Agua Botella                     2   2500   5000
+Gaseosa Personal                 1   3000   3000
+Combo Doble                      1  25000  25000
+Combo Perro                      1  18000  18000
+Helado 1 Bola                    1   4000   4000
+------------------------------------------------
+                              TOTAL $      55000
+                               Pago:   EFECTIVO
+------------------------------------------------
+            ¡Gracias por su visita!             
+

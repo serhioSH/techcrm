@@ -1,0 +1,19 @@
+             Mi Negocio de Comidas              
+------------------------------------------------
+Comprobante: #15
+Fecha: 2026-09-21
+Hora:  18:08:24
+Mesa:  -
+Cajero:Administrador
+Cliente: vn bgbvxn
+Entrega: g frg g g
+------------------------------------------------
+Producto                      Cant Precio    Sub
+------------------------------------------------
+Agua Botella                     1   2500   2500
+------------------------------------------------
+                              TOTAL $       2500
+                               Pago: TRANSFER...
+------------------------------------------------
+            ¡Gracias por su visita!             
+

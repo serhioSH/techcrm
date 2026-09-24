@@ -1,0 +1,8 @@
+{
+  "version": "1.0",
+  "download_url": "https://github.com/tuusuario/CRM/releases/download/v1.0/CRM.exe",
+  "changelog": "Versión inicial - Sistema POS completo con optimizaciones para bajo-resource",
+  "release_date": "2026-09-19",
+  "required_update": false,
+  "notes": "Primera versión estable. Recomendado para producción."
+}

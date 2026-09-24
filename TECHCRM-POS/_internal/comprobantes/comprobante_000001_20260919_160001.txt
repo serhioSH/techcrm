@@ -1,0 +1,19 @@
+             Mi Negocio de Comidas              
+------------------------------------------------
+Comprobante: #1
+Fecha: 2026-09-19
+Hora:  16:00:01
+Mesa:  Mesa 1
+Cajero:Administrador
+------------------------------------------------
+Producto                       Cant Precio    Sub
+------------------------------------------------
+Hamburguesa Especial              3  20000  60000
+Perro Ranchero                    1  15000  15000
+Papas Fritas Pequenas             3   5000  15000
+------------------------------------------------
+                                 TOTAL $    90000
+                               Pago:   EFECTIVO
+------------------------------------------------
+            ¡Gracias por su visita!             
+
