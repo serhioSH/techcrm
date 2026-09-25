@@ -177,38 +177,57 @@ class MainWindow(QMainWindow):
 
     def _navegar(self, key: str):
         """Navega a una pantalla SIN VALIDACIÓN DE PERMISOS"""
-        print(f"Navegando a: {key}")
+        try:
+            from app.utils.logger import configurar_logger
+            logger = configurar_logger("main_window")
+            logger.info(f"Navegando a: {key}")
+        except:
+            pass
         
         # Cargar pantalla si no existe
         if key not in self._pantallas:
             if key in self._fabrica_pantallas:
                 try:
-                    print(f"  Cargando {key}...")
                     pantalla = self._fabrica_pantallas[key]()
                     self._pantallas[key] = pantalla
                     self._stack.addWidget(pantalla)
-                    print(f"  ✓ {key} cargado")
                 except Exception as e:
-                    print(f"  ✗ Error cargando {key}: {e}")
-                    import traceback
-                    traceback.print_exc()
+                    try:
+                        logger.error(f"Error cargando {key}: {e}")
+                        import traceback
+                        logger.error(traceback.format_exc())
+                    except:
+                        pass
                     return
         
         # Desmarcar todos los botones
-        for btn in self._nav_botones.values():
-            btn.setChecked(False)
+        try:
+            for btn in self._nav_botones.values():
+                btn.setChecked(False)
+        except Exception as e:
+            pass
         
         # Marcar botón actual
-        if key in self._nav_botones:
-            self._nav_botones[key].setChecked(True)
+        try:
+            if key in self._nav_botones:
+                self._nav_botones[key].setChecked(True)
+        except Exception as e:
+            pass
         
         # Mostrar pantalla
-        if key in self._pantallas:
-            print(f"  Mostrando {key}")
-            self._stack.setCurrentWidget(self._pantallas[key])
-            pantalla = self._pantallas[key]
-            if hasattr(pantalla, "refrescar"):
-                pantalla.refrescar()
+        try:
+            if key in self._pantallas:
+                self._stack.setCurrentWidget(self._pantallas[key])
+                pantalla = self._pantallas[key]
+                if hasattr(pantalla, "refrescar"):
+                    pantalla.refrescar()
+        except Exception as e:
+            try:
+                logger.error(f"Error mostrando pantalla {key}: {e}")
+                import traceback
+                logger.error(traceback.format_exc())
+            except:
+                pass
 
     def _cambiar_mi_password(self):
         from app.ui.widgets.dialogo_password import DialogoPassword
