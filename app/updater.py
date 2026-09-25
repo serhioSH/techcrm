@@ -8,9 +8,13 @@ import os
 import subprocess
 import sys
 from typing import Tuple, Optional
-from app.utils.logger import get_logger
 
-logger = get_logger(__name__)
+try:
+    from app.utils.logger import configurar_logger
+    logger = configurar_logger("updater")
+except ImportError:
+    import logging
+    logger = logging.getLogger(__name__)
 
 VERSION = "1.0.1"
 
