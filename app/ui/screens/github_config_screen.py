@@ -126,31 +126,22 @@ class GithubConfigScreen(BaseScreen):
         layout.addWidget(self._lbl_actual)
     
     def _cargar_configuracion(self):
-        """Carga la URL actual de versioninfo.json"""
-        import json
-        import os
-        
+        """Carga la URL actual del ConfigManager"""
         try:
-            # Intentar leer versioninfo.json
-            versioninfo_path = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), 
-                "../..", 
-                "versioninfo.json"
-            )
+            from app.services.config_manager import get_config_manager
+            config = get_config_manager()
+            url = config.get_github_url()
             
-            if os.path.exists(versioninfo_path):
-                with open(versioninfo_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    url = data.get('download_url', 'No configurado')
-                    self._txt_url.setText(data.get('version_check_url', data.get('download_url', '')))
-                    self._lbl_actual.setText(f"URL: {url}")
+            if url:
+                self._txt_url.setText(url)
+                self._lbl_actual.setText(f"URL guardada: {url}")
             else:
-                self._lbl_actual.setText("No se encontro versioninfo.json")
+                self._lbl_actual.setText("No hay URL configurada")
         except Exception as e:
             self._lbl_actual.setText(f"Error cargando: {str(e)}")
     
     def _guardar_configuracion(self):
-        """Guarda la URL de GitHub en versioninfo.json"""
+        """Guarda la URL de GitHub en ConfigManager"""
         url = self._txt_url.text().strip()
         
         if not url:
@@ -161,37 +152,20 @@ class GithubConfigScreen(BaseScreen):
             QMessageBox.warning(self, "Error", "La URL debe comenzar con http:// o https://")
             return
         
-        import json
-        import os
-        
         try:
-            versioninfo_path = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), 
-                "../..", 
-                "versioninfo.json"
-            )
+            from app.services.config_manager import get_config_manager
+            config = get_config_manager()
             
-            # Leer archivo actual
-            if os.path.exists(versioninfo_path):
-                with open(versioninfo_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
+            # Guardar en ConfigManager (persiste en AppData)
+            if config.set_github_url(url):
+                QMessageBox.information(
+                    self, 
+                    "Exito", 
+                    "Configuracion guardada correctamente.\n\nLas actualizaciones se descargaran desde este URL."
+                )
+                self._lbl_actual.setText(f"URL guardada: {url}")
             else:
-                data = {"version": "1.0"}
-            
-            # Actualizar URL
-            data['version_check_url'] = url
-            data['download_url'] = url.replace('versioninfo.json', 'CRM.exe')
-            
-            # Guardar
-            with open(versioninfo_path, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-            
-            QMessageBox.information(
-                self, 
-                "Exito", 
-                "Configuracion guardada correctamente.\n\nLas actualizaciones se descargaran desde este URL."
-            )
-            self._lbl_actual.setText(f"URL: {url}")
+                QMessageBox.critical(self, "Error", "No se pudo guardar la configuracion")
             
         except Exception as e:
             QMessageBox.critical(self, "Error", f"No se pudo guardar: {str(e)}")
