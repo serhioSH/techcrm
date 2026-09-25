@@ -5,6 +5,7 @@
 # ============================================================
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Optional, Any
 
@@ -25,7 +26,6 @@ class ConfigManager:
         # Directorio de datos de la aplicación
         if getattr(sys, 'frozen', False):
             # Ejecutable compilado (PyInstaller)
-            import sys
             self._app_dir = os.path.dirname(sys.executable)
         else:
             # Modo desarrollo
@@ -173,6 +173,3 @@ def get_config_manager() -> ConfigManager:
     if _config_manager is None:
         _config_manager = ConfigManager()
     return _config_manager
-
-
-import sys
