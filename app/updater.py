@@ -103,7 +103,196 @@ def check_updates() -> Tuple[bool, str, Optional[str], Optional[str]]:
     
     except Exception as e:
         logger.error(f"Error verificando actualizaciones: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False, VERSION, None, None
+
+
+def download_update(url: str, filename: str = "TECHCRM_update.exe", progress_callback=None) -> bool:
+    """
+    Descarga la nueva versión con indicador de progreso.
+    progress_callback: función(bytes_descargados, bytes_totales) para actualizar UI
+    """
+    try:
+        logger.info(f"Descargando actualización desde: {url}")
+        response = requests.get(url, stream=True, timeout=120)
+        response.raise_for_status()
+        
+        total_size = int(response.headers.get("content-length", 0))
+        downloaded = 0
+        
+        with open(filename, "wb") as f:
+            for chunk in response.iter_content(chunk_size=1024 * 100):  # 100KB chunks
+                if chunk:
+                    f.write(chunk)
+                    downloaded += len(chunk)
+                    
+                    # Notificar progreso
+                    if progress_callback:
+                        try:
+                            progress_callback(downloaded, total_size)
+                        except:
+                            pass
+                    
+                    # Log del progreso cada 10%
+                    if total_size > 0:
+                        percent = int((downloaded / total_size) * 100)
+                        if percent % 10 == 0 and percent > 0:
+                            logger.info(f"Descarga: {percent}% ({downloaded / 1024 / 1024:.1f} MB)")
+        
+        logger.info(f"Descarga completada: {filename}")
+        return True
+    except Exception as e:
+        logger.error(f"Error descargando actualización: {e}")
+        try:
+            if os.path.exists(filename):
+                os.remove(filename)
+        except:
+            pass
+        return False
+
+
+def install_update(new_exe_path: str) -> bool:
+    """Instala la actualización reemplazando el ejecutable actual."""
+    try:
+        if not os.path.exists(new_exe_path):
+            logger.error(f"Archivo de actualización no existe: {new_exe_path}")
+            return False
+        
+        current_exe = sys.executable
+        
+        # En modo desarrollo (python.exe), no actualizar
+        if "python" in current_exe.lower():
+            logger.warning("Corriendo en modo desarrollo. No se puede auto-actualizar.")
+            return False
+        
+        logger.info(f"Instalando actualización...")
+        logger.info(f"Ejecutable actual: {current_exe}")
+        logger.info(f"Nuevo ejecutable: {new_exe_path}")
+        
+        # Crear script de actualización
+        batch_script = f"""@echo off
+REM Esperar 2 segundos
+timeout /t 2 >nul
+
+REM Reemplazar el ejecutable
+move /Y "{new_exe_path}" "{current_exe}"
+
+REM Reiniciar la aplicación
+start "" "{current_exe}"
+
+REM Eliminar este script
+del "%~f0"
+"""
+        
+        batch_file = "update_techcrm.bat"
+        with open(batch_file, "w") as f:
+            f.write(batch_script)
+        
+        logger.info("Iniciando script de instalación...")
+        subprocess.Popen(batch_file, shell=True)
+        return True
+    except Exception as e:
+        logger.error(f"Error instalando actualización: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
+
+
+def check_and_update_with_dialog() -> bool:
+    """
+    Verifica actualizaciones y muestra diálogo si está disponible Qt.
+    Retorna True si continuar, False si debe cerrar para actualizar.
+    """
+    try:
+        hay_update, version, download_url, description = check_updates()
+        
+        if not hay_update:
+            return True
+        
+        try:
+            from PySide6.QtWidgets import QMessageBox, QApplication, QProgressDialog
+            from PySide6.QtCore import Qt
+            
+            app = QApplication.instance()
+            if app is None:
+                return True
+            
+            # Diálogo de confirmación
+            msg = f"Nueva versión disponible: v{version}\n\n{description}\n\n¿Descargar e instalar?"
+            reply = QMessageBox.question(
+                None,
+                "Actualización disponible",
+                msg,
+                QMessageBox.Yes | QMessageBox.No
+            )
+            
+            if reply != QMessageBox.Yes:
+                return True
+            
+            # Diálogo de progreso
+            progress = QProgressDialog(
+                "Descargando actualización...",
+                "Cancelar",
+                0, 100
+            )
+            progress.setWindowTitle("TECHCRM - Descargando")
+            progress.setModal(True)
+            progress.show()
+            
+            def update_progress(downloaded, total):
+                if total > 0:
+                    percent = int((downloaded / total) * 100)
+                    progress.setValue(percent)
+                    mb_downloaded = downloaded / 1024 / 1024
+                    mb_total = total / 1024 / 1024
+                    progress.setLabelText(f"Descargando actualización...\n{mb_downloaded:.1f} MB / {mb_total:.1f} MB")
+                try:
+                    QApplication.processEvents()
+                except:
+                    pass
+            
+            # Descargar
+            if download_update(download_url, "TECHCRM_update.exe", update_progress):
+                progress.close()
+                
+                # Mensaje de instalación
+                QMessageBox.information(
+                    None,
+                    "Actualización descargada",
+                    "La actualización se instalará al cerrar la aplicación."
+                )
+                
+                if install_update("TECHCRM_update.exe"):
+                    return False  # Cerrar para instalar
+            else:
+                progress.close()
+                QMessageBox.warning(
+                    None,
+                    "Error",
+                    "No se pudo descargar la actualización."
+                )
+            
+            return True
+        except ImportError:
+            logger.warning("PySide6 no disponible, saltando actualización")
+            return True
+    
+    except Exception as e:
+        logger.error(f"Error crítico en check_and_update_with_dialog: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return True
+
+
+if __name__ == "__main__":
+    hay_update, version, url, description = check_updates()
+    if hay_update:
+        print(f"✅ Update disponible: v{version}")
+        print(f"📥 {url}")
+        print(f"📝 {description}")
+    else:
+        print(f"✅ Versión actual es la más reciente: v{get_local_version()}")
 
 
 def download_update(url: str, filename: str = "TECHCRM_update.exe", progress_callback=None) -> bool:
