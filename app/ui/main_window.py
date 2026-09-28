@@ -170,10 +170,22 @@ class MainWindow(QMainWindow):
             self._navegar(items[0][0])
     
     def _import_screen(self, module_name: str, class_name: str):
-        """Importa pantalla de forma lazy"""
-        module = __import__(f"app.ui.screens.{module_name}", fromlist=[class_name])
-        screen_class = getattr(module, class_name)
-        return screen_class(self._db, self._auth)
+        """Importa pantalla de forma lazy - Compatible con PyInstaller"""
+        try:
+            import importlib
+            module = importlib.import_module(f"app.ui.screens.{module_name}")
+            screen_class = getattr(module, class_name)
+            return screen_class(self._db, self._auth)
+        except Exception as e:
+            try:
+                from app.utils.logger import configurar_logger
+                logger = configurar_logger("main_window")
+                logger.error(f"Error importando {module_name}: {e}")
+                import traceback
+                logger.error(traceback.format_exc())
+            except:
+                pass
+            raise
 
     def _navegar(self, key: str):
         """Navega a una pantalla SIN VALIDACIÓN DE PERMISOS"""
