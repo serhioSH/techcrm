@@ -1,0 +1,350 @@
+================================================================================
+                   GUIA DE FIRMA DIGITAL - TECHCRM-POS
+================================================================================
+
+INDICE:
+1. Por qué firmar código
+2. Preparación
+3. Opción A: Usando signtool (Windows SDK)
+4. Opción B: Alternativas
+5. Verificación
+6. Troubleshooting
+
+================================================================================
+1. POR QUE FIRMAR CODIGO
+================================================================================
+
+VENTAJAS:
+✓ Elimina advertencia: "Unknown Publisher"
+✓ Reduce SmartScreen warnings de Windows Defender
+✓ Establece confianza y autenticidad
+✓ Demuestra que el .exe es legítimo
+✓ Profesional para clientes
+
+DESVENTAJAS SIN FIRMA:
+✗ Windows Defender puede bloquearlo
+✗ SmartScreen muestra: "Windows protected your PC"
+✗ Usuario debe hacer clic "More info → Run anyway"
+✗ Menos profesional
+
+CERTIFICADO DISPONIBLE:
+- Archivo: techpixelc-cert.pfx
+- Contraseña: techpixel2026
+- Nombre: CN=Tech Pixel C, O=Tech Pixel C, C=MX
+- Tipo: Auto-firmado (no desde autoridad certificadora)
+
+================================================================================
+2. PREPARACION
+================================================================================
+
+PASO 1: Verificar que tienes el certificado
+-----------------------------------------
+Archivo esperado:
+    c:\Users\duvan\OneDrive\Desktop\Nueva carpeta\git\CRM\techpixelc-cert.pfx
+
+Si no existe, debes crear uno primero (ver OPCION B).
+
+PASO 2: Verificar que tienes el .exe compilado
+----------------------------------------------
+Archivo esperado:
+    c:\Users\duvan\OneDrive\Desktop\Nueva carpeta\git\CRM\dist\TECHCRM-POS.exe
+
+Si no existe, compila primero:
+    pyinstaller main.spec --clean
+
+================================================================================
+3. OPCION A: USANDO SIGNTOOL (Windows SDK)
+================================================================================
+
+SIGNTOOL.EXE es la herramienta oficial de Microsoft para firmar código.
+Se instala con el Windows SDK.
+
+PASO 1: Instalar Windows SDK
+----------------------------
+Opción 1 - Visual Studio (si lo tienes):
+1. Abre Visual Studio Installer
+2. Haz clic en tu versión instalada
+3. Haz clic "Modify"
+4. Busca "Windows SDK"
+5. Actívalo
+6. Instala
+
+Opción 2 - Descarga directa:
+1. Abre: https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/
+2. Descarga la versión más reciente
+3. Ejecuta el instalador
+4. Elige instalar solo "Windows SDK"
+5. Completa la instalación
+
+PASO 2: Verificar instalación
+------------------------------
+Abre PowerShell y ejecuta:
+    signtool /?
+
+Debería mostrar ayuda si está instalado correctamente.
+
+Si no funciona, busca signtool.exe manualmente:
+    Get-ChildItem -Path "C:\Program Files" -Recurse -Filter "signtool.exe" 2>$null
+
+PASO 3: Firmar el ejecutable
+----------------------------
+Abre PowerShell como ADMINISTRADOR y ejecuta:
+
+```powershell
+cd "c:\Users\duvan\OneDrive\Desktop\Nueva carpeta\git\CRM"
+
+signtool sign /f "techpixelc-cert.pfx" `
+              /p "techpixel2026" `
+              /fd SHA256 `
+              /t http://timestamp.comodoca.com/authenticode `
+              "dist/TECHCRM-POS.exe"
+```
+
+ALTERNATIVA (en una línea):
+```
+signtool sign /f "techpixelc-cert.pfx" /p "techpixel2026" /fd SHA256 /t http://timestamp.comodoca.com/authenticode "dist/TECHCRM-POS.exe"
+```
+
+PASO 4: Verificar firma
+-----------------------
+```powershell
+signtool verify /pa "dist/TECHCRM-POS.exe"
+```
+
+Debería mostrar:
+    SignTool Error: No certificates were found that met all the given criteria.
+
+O si se firmó correctamente:
+    Successfully verified: dist/TECHCRM-POS.exe
+
+PASO 5: Verificar con Windows Explorer
+---------------------------------------
+1. Click derecho en dist/TECHCRM-POS.exe
+2. Propiedades
+3. Pestaña "Digital Signatures"
+4. Debería mostrar la firma
+
+================================================================================
+4. OPCION B: ALTERNATIVAS (Sin Windows SDK)
+================================================================================
+
+METODO B1: Usar Python + pyOpenSSL (No recomendado para .exe)
+-------------------------------------------------------------
+```bash
+pip install pyOpenSSL
+```
+
+Nota: Más complejo y no produce el resultado ideal para .exe de Windows.
+
+METODO B2: Timestamp Server
+----------------------------
+Si no tienes signtool, puedes usar servicios en línea:
+- comodo.com/codesigning/
+- sectigo.com (ofrece servicios de firma)
+- codesigningstore.com
+
+Pero requieren acceso web y son de pago.
+
+METODO B3: Sin firma (Para desarrollo/testing)
+----------------------------------------------
+Puedes distribuir sin firma para:
+- Testing interno
+- Usuarios técnicos que confíen en ti
+- Entorno de desarrollo
+
+Los usuarios verán SmartScreen pero pueden ejecutar igualmente.
+
+METODO B4: Alternativa con signtool.exe
+----------------------------------------
+Si Windows SDK no está disponible, intenta esto:
+
+1. Busca signtool.exe en tu disco:
+   ```powershell
+   Get-ChildItem -Path "C:\Program Files*" -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue
+   ```
+
+2. Si lo encuentras, usa su ruta completa:
+   ```powershell
+   "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign ...
+   ```
+
+================================================================================
+5. VERIFICACION
+================================================================================
+
+VERIFICAR FIRMA VISUALMENTE
+---------------------------
+1. Click derecho → dist/TECHCRM-POS.exe
+2. Propiedades
+3. Si está firmado correctamente:
+   - Pestaña "Digital Signatures" aparece
+   - Debería listar el certificado
+   - No debería haber advertencias de seguridad
+
+VERIFICAR EN WINDOWS DEFENDER
+-----------------------------
+1. Descarga el .exe en otra carpeta
+2. Haz doble clic
+3. Si está correctamente firmado:
+   ✓ NO debería mostrar SmartScreen
+   ✓ Debería iniciar directamente
+   ✓ En Detalles de Aplicación, sería de confianza
+
+VERIFICAR CON VIRUSTOTAL
+------------------------
+(Opcional, para estar seguro)
+1. Abre https://www.virustotal.com
+2. Sube el .exe
+3. Espera a que analice
+4. Verifica que sea reconocido correctamente
+
+================================================================================
+6. TROUBLESHOOTING
+================================================================================
+
+PROBLEMA: "signtool is not recognized"
+---------------------------------------
+CAUSA: Windows SDK no está instalado
+SOLUCION: Ver PASO 1 en OPCION A para instalar SDK
+
+PROBLEMA: "Error reading PFX file"
+----------------------------------
+CAUSA: Contraseña incorrecta o archivo corrupto
+SOLUCION:
+- Verifica que escribiste bien: techpixel2026
+- Verifica que el archivo existe: techpixelc-cert.pfx
+- Si persiste, recrea el certificado
+
+PROBLEMA: "Operation Succeeded" pero no aparece firma
+------------------------------------------------------
+CAUSA: Posiblemente timeout del timestamp server
+SOLUCION: Intenta otro servidor de timestamp:
+- http://timestamp.comodoca.com/authenticode
+- http://ts.globalsign.com/fc1
+- http://timestamp.sectigo.com
+
+PROBLEMA: SmartScreen sigue apareciendo después de firmar
+----------------------------------------------------------
+CAUSA: Es normal para certificados auto-firmados en primeros usos
+SOLUCION:
+- SmartScreen aprende con el tiempo (10-20 descargas)
+- Certificados comerciales evitan esto (cuestan dinero)
+- Los usuarios pueden confiar en tu app
+
+PROBLEMA: Certificate expired
+------------------------------
+CAUSA: El certificado techpixelc-cert.pfx venció
+SOLUCION: Crear uno nuevo (ver receta abajo)
+
+================================================================================
+7. CREAR CERTIFICADO NUEVO (Si es necesario)
+================================================================================
+
+CREAR CERTIFICADO AUTO-FIRMADO CON POWERSHELL
+-----------------------------------------------
+
+```powershell
+# Cambiar contraseña si es necesario
+$password = ConvertTo-SecureString -String "techpixel2026" -Force -AsPlainText
+
+# Crear certificado válido por 5 años
+$cert = New-SelfSignedCertificate `
+    -DnsName "Tech Pixel C" `
+    -Type CodeSigning `
+    -CertStoreLocation "cert:\CurrentUser\My" `
+    -NotAfter (Get-Date).AddYears(5) `
+    -Subject "CN=Tech Pixel C, O=Tech Pixel C, C=MX"
+
+# Exportar a archivo .pfx
+Export-PfxCertificate `
+    -Cert $cert `
+    -FilePath "techpixelc-cert.pfx" `
+    -Password $password
+
+Write-Host "Certificado creado: techpixelc-cert.pfx"
+```
+
+================================================================================
+8. DISTRIBUCION FINAL
+================================================================================
+
+ARCHIVO LISTO PARA DISTRIBUIR:
+    dist/TECHCRM-POS.exe
+
+OPCIONES:
+1. Subir a GitHub Releases (recomendado)
+2. Enviar por email
+3. Hospedar en servidor web
+4. Copiar a USB
+
+IMPORTANTE:
+- El .exe puede distribuirse directamente
+- No necesita instalador especial
+- Usuarios hacen doble clic y funciona
+- Guarda configuración en AppData\Local\TECHCRM\
+
+================================================================================
+9. RESUMEN RECOMENDADO
+================================================================================
+
+PARA PRODUCCION (Clientes):
+1. Instala Windows SDK
+2. Firma con signtool (OPCION A)
+3. Distribuye .exe firmado
+4. Suben a GitHub Releases
+5. Usuarios descargan y ejecutan
+
+PARA DESARROLLO (Testing):
+1. Compila sin firmar (normal)
+2. Prueba localmente
+3. Distribución interna sin firma
+4. Usuarios técnicos que confían en ti
+
+================================================================================
+10. COMANDOS RAPIDOS
+================================================================================
+
+Compilar:
+    cd "c:\Users\duvan\OneDrive\Desktop\Nueva carpeta\git\CRM"
+    pyinstaller main.spec --clean
+
+Firmar (si tienes Windows SDK):
+    signtool sign /f "techpixelc-cert.pfx" /p "techpixel2026" /fd SHA256 /t http://timestamp.comodoca.com/authenticode "dist/TECHCRM-POS.exe"
+
+Verificar firma:
+    signtool verify /pa "dist/TECHCRM-POS.exe"
+
+Buscar signtool:
+    Get-ChildItem -Path "C:\Program Files*" -Recurse -Filter "signtool.exe" 2>$null
+
+================================================================================
+11. REFERENCIAS
+================================================================================
+
+Windows SDK:
+https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/
+
+Microsoft Docs - Signing:
+https://docs.microsoft.com/en-us/windows-hardware/drivers/install/authenticode
+
+PowerShell Certificates:
+https://learn.microsoft.com/en-us/powershell/module/pki/new-selfsignedcertificate
+
+================================================================================
+
+ESTADO ACTUAL (2026-09-23):
+- ✓ Certificado disponible: techpixelc-cert.pfx
+- ✗ Windows SDK no está instalado
+- ✓ .exe compilado y listo: dist/TECHCRM-POS.exe
+- ⚠ Firma pendiente: requiere Windows SDK
+
+PRÓXIMOS PASOS:
+1. Opción A: Instalar Windows SDK y firmar con signtool
+2. Opción B: Distribuir sin firma (para testing)
+3. Opción C: Usar servicio de firma en línea (de pago)
+
+================================================================================
+Documento: FIRMAR_EJECUTABLE.txt
+Versión: 1.0
+Fecha: 2026-09-23
+Estado: COMPLETO

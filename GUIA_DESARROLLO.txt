@@ -1,0 +1,683 @@
+================================================================================
+              GUIA DE DESARROLLO - TECHCRM-POS
+              Sistema de POS para Restaurantes
+================================================================================
+
+INDICE:
+1. Descripcion General
+2. Arquitectura del Proyecto
+3. Stack Tecnologico
+4. Estructura de Carpetas
+5. Componentes Principales
+6. Servicos Clave
+7. Base de Datos
+8. Flujo de Datos
+9. Sistema de Actualizaciones
+10. Compilacion y Deployment
+11. Troubleshooting
+12. Proximas Mejoras
+
+================================================================================
+1. DESCRIPCION GENERAL
+================================================================================
+
+TECHCRM-POS es un sistema punto de venta (POS) diseñado para restaurantes y 
+establecimientos de comida rápida. Permite:
+
+- Gestión de mesas y pedidos
+- Control de inventario de productos
+- Procesamiento de pagos/cobros
+- Reportes de ventas y movimientos
+- Gestión de usuarios con permisos
+- Impresión térmica de tickets
+- Sistema de cajas y cierre diario
+- Actualizaciones automáticas desde GitHub
+
+El sistema está desarrollado con Python 3.12, PySide6 (Qt para Python), 
+SQLite y es compilado a ejecutable con PyInstaller para distribución.
+
+================================================================================
+2. ARQUITECTURA DEL PROYECTO
+================================================================================
+
+El proyecto sigue una arquitectura en capas:
+
+    ┌─────────────────────────────────────────┐
+    │         CAPA DE PRESENTACION            │
+    │  (UI / Interfaz Gráfica con PySide6)   │
+    │  - main_window.py (ventana principal)   │
+    │  - login_window.py (pantalla login)     │
+    │  - screens/ (pantallas específicas)     │
+    └─────────────────────────────────────────┘
+                        ↓
+    ┌─────────────────────────────────────────┐
+    │         CAPA DE SERVICIOS               │
+    │  (Lógica de Negocio)                    │
+    │  - venta_service.py                     │
+    │  - usuario_service.py                   │
+    │  - producto_service.py                  │
+    │  - etc...                               │
+    └─────────────────────────────────────────┘
+                        ↓
+    ┌─────────────────────────────────────────┐
+    │         CAPA DE MODELOS                 │
+    │  (Entidades de Datos)                   │
+    │  - usuario.py                           │
+    │  - venta.py                             │
+    │  - producto.py                          │
+    │  - mesa.py                              │
+    │  - caja.py                              │
+    └─────────────────────────────────────────┘
+                        ↓
+    ┌─────────────────────────────────────────┐
+    │         CAPA DE DATOS                   │
+    │  (Acceso a Base de Datos)               │
+    │  - connection.py (conexión SQLite)      │
+    │  - migrations.py (esquema DB)           │
+    │  - seeder.py (datos iniciales)          │
+    └─────────────────────────────────────────┘
+
+VENTAJAS DE ESTA ARQUITECTURA:
+- Separación de responsabilidades
+- Fácil de mantener y escalar
+- Facilita testing
+- Cambios en UI no afectan lógica de negocios
+
+================================================================================
+3. STACK TECNOLOGICO
+================================================================================
+
+LENGUAJE:
+- Python 3.12.10
+
+INTERFAZ GRÁFICA:
+- PySide6 (PyQt6) - Bindings de Python para Qt6
+- Soporta Windows, Mac, Linux
+
+BASE DE DATOS:
+- SQLite3 - Base de datos embebida (archivo crm_system.db)
+- Sin servidor externo requerido
+- Portátil y fácil de respaldar
+
+DEPENDENCIAS PRINCIPALES:
+- PySide6 - Interfaz gráfica
+- python-dotenv - Manejo de variables de entorno
+- requests - Cliente HTTP (para actualizaciones)
+- pyinstaller - Compilación a .exe
+- pillow - Procesamiento de imágenes
+- openpyxl - Generación de reportes Excel
+- escpos - Comunicación con impresoras térmicas
+- pyperclip - Portapapeles
+
+VER requirements.txt PARA LISTA COMPLETA
+
+IMPRESION:
+- Soporte para impresoras térmicas (ESC/POS)
+- Generación de tickets en Python
+- Sin necesidad de drivers específicos
+
+ACTUALIZACIONES:
+- GitHub API para verificar versiones
+- Descarga automática desde Releases
+- Sistema de verificación de versión integrado
+
+================================================================================
+4. ESTRUCTURA DE CARPETAS
+================================================================================
+
+CRM/
+│
+├── main.py                          ← PUNTO DE ENTRADA
+├── main.spec                        ← Config para PyInstaller
+├── requirements.txt                 ← Dependencias pip
+├── version.json                     ← Versión actual (para updates)
+│
+├── app/                             ← CODIGO FUENTE PRINCIPAL
+│   ├── assets/
+│   │   └── icon.ico                 ← Icono de la app
+│   │
+│   ├── database/                    ← CAPA DE DATOS
+│   │   ├── connection.py            - Conexión SQLite
+│   │   ├── migrations.py            - Creación de tablas (esquema)
+│   │   ├── seeder.py                - Datos iniciales
+│   │   └── __init__.py
+│   │
+│   ├── models/                      ← CAPA DE MODELOS (Entidades)
+│   │   ├── usuario.py               - Modelo de Usuario
+│   │   ├── producto.py              - Modelo de Producto
+│   │   ├── venta.py                 - Modelo de Venta
+│   │   ├── mesa.py                  - Modelo de Mesa
+│   │   ├── caja.py                  - Modelo de Caja
+│   │   └── __init__.py
+│   │
+│   ├── services/                    ← CAPA DE SERVICIOS (Lógica)
+│   │   ├── usuario_service.py       - Gestión de usuarios
+│   │   ├── producto_service.py      - Gestión de productos
+│   │   ├── venta_service.py         - Procesamiento de ventas
+│   │   ├── mesa_service.py          - Gestión de mesas
+│   │   ├── caja_service.py          - Gestión de cajas
+│   │   ├── inventario_service.py    - Control de inventario
+│   │   ├── cobro_service.py         - Procesar pagos
+│   │   ├── reporte_service.py       - Generación de reportes
+│   │   ├── configuracion_service.py - Configuraciones globales
+│   │   ├── config_manager.py        - Persistencia de config
+│   │   ├── auth_service.py          - Autenticación
+│   │   ├── permisos.py              - Control de permisos
+│   │   ├── comprobante_service.py   - Generación de comprobantes
+│   │   ├── backup_service.py        - Copias de seguridad
+│   │   ├── system_service.py        - Info del sistema
+│   │   └── __init__.py
+│   │
+│   ├── ui/                          ← CAPA DE PRESENTACION (UI)
+│   │   ├── main_window.py           - Ventana principal
+│   │   ├── login_window.py          - Pantalla de login
+│   │   │
+│   │   ├── screens/                 - Pantallas específicas
+│   │   │   ├── _base_screen.py      - Clase base para pantallas
+│   │   │   ├── mesas_screen.py      - Gestión de mesas
+│   │   │   ├── productos_screen.py  - Catálogo de productos
+│   │   │   ├── pedido_screen.py     - Crear/editar pedidos
+│   │   │   ├── usuarios_screen.py   - Gestión de usuarios
+│   │   │   ├── caja_screen.py       - Operaciones de caja
+│   │   │   ├── cobro_screen.py      - Procesar cobros
+│   │   │   ├── inventario_screen.py - Control de inventario
+│   │   │   ├── reportes_screen.py   - Reportes y estadísticas
+│   │   │   ├── historial_screen.py  - Historial de transacciones
+│   │   │   ├── configuracion_screen.py - Configuración de app
+│   │   │   ├── github_config_screen.py - Config de actualizaciones
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── widgets/                 - Componentes reutilizables
+│   │   │   ├── catalogo_widget.py   - Widget de catálogo
+│   │   │   ├── mesa_card.py         - Tarjeta de mesa
+│   │   │   ├── dialogo_usuario.py   - Diálogo de usuario
+│   │   │   ├── dialogo_password.py  - Cambio de password
+│   │   │   └── dialogo_domicilio.py - Datos de domicilio
+│   │   │
+│   │   └── themes/                  - Estilos visuales
+│   │       ├── colors.py            - Paleta de colores
+│   │       └── __init__.py
+│   │
+│   └── printing/                    ← IMPRESION
+│       ├── printer_manager.py       - Gestor de impresoras
+│       ├── escpos.py                - Protocolo ESC/POS
+│       ├── ticket_formatter.py      - Formato de tickets
+│       └── __init__.py
+│
+├── dist/                            ← COMPILADO (GENERADO)
+│   └── TECHCRM-POS.exe              - Ejecutable final
+│
+├── build/                           ← TEMPORAL (GENERADO)
+│   └── (archivos de compilación)
+│
+├── ACTUALIZACION.md                 ← GUIA DE ACTUALIZACION
+├── GUIA_DESARROLLO.txt              ← ESTE ARCHIVO
+├── README.md
+└── .gitignore
+
+ARCHIVOS GENERADOS EN TIEMPO DE EJECUCION
+(Ubicación: %LOCALAPPDATA%\TECHCRM\)
+
+├── config.json                      - Configuración persistente
+├── crm_system.db                    - Base de datos SQLite
+├── logs/
+│   └── app.log                      - Archivo de log
+├── backups/
+│   └── crm_system_FECHA.db          - Copias de seguridad automáticas
+├── comprobantes/
+│   └── comprobante_*.txt            - Comprobantes generados
+└── reportes/
+    └── reporte_*.xlsx               - Reportes en Excel
+
+================================================================================
+5. COMPONENTES PRINCIPALES
+================================================================================
+
+MAIN.PY
+-------
+- Punto de entrada de la aplicación
+- Inicializa base de datos
+- Muestra pantalla de login
+- Conecta señales para actualización automática
+- Manejo de excepciones global
+
+MAIN_WINDOW.PY (Ventana Principal)
+----------------------------------
+Responsable de:
+- Interfaz principal después del login
+- Menú de navegación lateral
+- Carga dinámica de pantallas
+- Gestión de sesión del usuario
+- Barra de estado
+
+Flujo de Carga de Pantallas:
+1. Usuario hace clic en botón (ej: "Mesas")
+2. main_window.py importa dinámicamente: app.ui.screens.mesas_screen
+3. Crea instancia de MesasScreen
+4. Reemplaza el contenido central
+5. Pantalla comienza a funcionar
+
+LOGIN_WINDOW.PY
+---------------
+- Autenticación de usuario
+- Validación de credenciales
+- Conexión con auth_service.py
+- Gestión de sesión
+
+SCREENS (Pantallas Especializadas)
+----------------------------------
+Cada pantalla hereda de _base_screen.py y proporciona:
+
+- Interfaz para una función específica (mesas, productos, etc)
+- Tabla/lista de datos con botones
+- Diálogos para crear/editar/eliminar
+- Validación de datos
+- Comunicación con servicios
+
+Ejemplo: mesas_screen.py
+- Muestra tabla de mesas
+- Botones: Crear, Editar, Eliminar, Seleccionar
+- Diálogo para crear nueva mesa
+- Al guardar, llama mesa_service.create_mesa()
+
+================================================================================
+6. SERVICIOS CLAVE
+================================================================================
+
+USUARIO_SERVICE.PY
+------------------
+Operaciones:
+- Crear usuario
+- Autenticar usuario (login)
+- Cambiar contraseña
+- Obtener lista de usuarios
+- Verificar permisos
+
+Ejemplo:
+    usuario = usuario_service.authenticate("admin", "password123")
+    if usuario:
+        print(f"Bienvenido {usuario.nombre}")
+
+VENTA_SERVICE.PY
+----------------
+Operaciones:
+- Crear venta
+- Agregar ítems a venta
+- Calcular total
+- Aplicar descuentos
+- Finalizar venta
+- Obtener ventas
+
+Ejemplo:
+    venta = venta_service.crear_venta(mesa_id=1, usuario_id=5)
+    venta_service.agregar_item(venta_id=venta.id, producto_id=10, cantidad=2)
+    venta_service.finalizar_venta(venta.id, monto_pagado=150.00)
+
+PRODUCTO_SERVICE.PY
+-------------------
+Operaciones:
+- Crear/editar/eliminar producto
+- Obtener producto por ID
+- Listar todos los productos
+- Obtener productos activos
+- Buscar por nombre/categoría
+
+MESA_SERVICE.PY
+---------------
+Operaciones:
+- Crear/editar/eliminar mesa
+- Obtener estado de mesa
+- Cambiar estado (disponible/ocupada/pagando)
+- Listar mesas
+
+CAJA_SERVICE.PY
+---------------
+Operaciones:
+- Abrir caja
+- Registrar ingresos/egresos
+- Obtener movimientos
+- Cerrar caja (cierre de día)
+- Calcular diferencias
+
+COBRO_SERVICE.PY
+----------------
+Operaciones:
+- Registrar cobro
+- Procesar múltiples pagos
+- Calcular vuelto
+- Generar recibos
+
+CONFIG_MANAGER.PY
+-----------------
+Persiste configuración en AppData:
+- Ubicación: %LOCALAPPDATA%\TECHCRM\config.json
+
+Ejemplo:
+    config = ConfigManager()
+    github_url = config.get("github.version_check_url")
+    config.set("github.version_check_url", "https://...")
+    config.save()
+
+================================================================================
+7. BASE DE DATOS
+================================================================================
+
+ESQUEMA PRINCIPAL
+-----------------
+
+USUARIOS
+--------
+CREATE TABLE usuarios (
+    id INTEGER PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    rol TEXT NOT NULL,  -- admin, cajero, mesero, cocina
+    activo BOOLEAN DEFAULT 1,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+
+PRODUCTOS
+---------
+CREATE TABLE productos (
+    id INTEGER PRIMARY KEY,
+    nombre TEXT NOT NULL UNIQUE,
+    descripcion TEXT,
+    precio_venta DECIMAL(10,2) NOT NULL,
+    precio_costo DECIMAL(10,2),
+    stock INTEGER DEFAULT 0,
+    categoria TEXT,
+    activo BOOLEAN DEFAULT 1
+)
+
+VENTAS
+------
+CREATE TABLE ventas (
+    id INTEGER PRIMARY KEY,
+    mesa_id INTEGER,
+    usuario_id INTEGER,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total DECIMAL(10,2),
+    estado TEXT,  -- pendiente, pagada, cancelada
+    FOREIGN KEY(mesa_id) REFERENCES mesas(id),
+    FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
+)
+
+VENTA_ITEMS
+-----------
+CREATE TABLE venta_items (
+    id INTEGER PRIMARY KEY,
+    venta_id INTEGER,
+    producto_id INTEGER,
+    cantidad INTEGER,
+    precio_unitario DECIMAL(10,2),
+    subtotal DECIMAL(10,2),
+    FOREIGN KEY(venta_id) REFERENCES ventas(id),
+    FOREIGN KEY(producto_id) REFERENCES productos(id)
+)
+
+MESAS
+-----
+CREATE TABLE mesas (
+    id INTEGER PRIMARY KEY,
+    numero INTEGER UNIQUE,
+    zona TEXT,
+    capacidad INTEGER,
+    estado TEXT DEFAULT 'disponible'  -- disponible, ocupada, pagando
+)
+
+CAJAS
+-----
+CREATE TABLE cajas (
+    id INTEGER PRIMARY KEY,
+    fecha_apertura TIMESTAMP,
+    fecha_cierre TIMESTAMP,
+    monto_inicial DECIMAL(10,2),
+    usuario_id INTEGER,
+    estado TEXT DEFAULT 'abierta',  -- abierta, cerrada
+    FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
+)
+
+CAJA_MOVIMIENTOS
+----------------
+CREATE TABLE caja_movimientos (
+    id INTEGER PRIMARY KEY,
+    caja_id INTEGER,
+    tipo TEXT,  -- ingreso, egreso, venta
+    descripcion TEXT,
+    monto DECIMAL(10,2),
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(caja_id) REFERENCES cajas(id)
+)
+
+================================================================================
+8. FLUJO DE DATOS
+================================================================================
+
+EJEMPLO: Crear una Nueva Venta
+------------------------------
+
+UI (pedido_screen.py):
+    - Usuario selecciona productos
+    - Usuario hace clic "Guardar Venta"
+
+SERVICIO (venta_service.py):
+    - venta_service.crear_venta(mesa_id, usuario_id)
+    - venta_service.agregar_item(venta_id, producto_id, cantidad)
+    - venta_service.finalizar_venta(venta_id, monto_pagado)
+
+MODELOS (venta.py, venta_items.py):
+    - Validación de datos
+    - Cálculo de totales
+
+BASE DE DATOS (connection.py):
+    - INSERT INTO ventas ...
+    - INSERT INTO venta_items ...
+    - UPDATE mesas SET estado='pagando' ...
+
+BD ACTUALIZADA:
+    - Venta registrada
+    - Ítems guardados
+    - Mesa marcada como pagando
+
+RESPUESTA A UI:
+    - venta_service retorna venta creada
+    - UI muestra confirmación
+    - UI imprime ticket (opcional)
+
+================================================================================
+9. SISTEMA DE ACTUALIZACIONES
+================================================================================
+
+VERSIONING
+----------
+La versión actual está en: version.json
+
+{
+  "version": "1.0.1",
+  "download_url": "https://github.com/serhioSH/techcrm/releases/download/v1.0.1/TECHCRM-POS.exe",
+  "release_date": "2026-09-23",
+  "description": "Bug fixes y mejoras"
+}
+
+VERIFICACION AUTOMATICA
+-----------------------
+1. Al iniciar la app, se ejecuta updater.py
+2. Lee version.json local
+3. Conecta con GitHub y obtiene version.json remoto
+4. Compara versiones: local vs remoto
+5. Si hay versión más nueva:
+   - Muestra diálogo: "Actualización disponible"
+   - Si usuario elige "Sí":
+     a. Descarga el .exe nuevo
+     b. Lo guarda en carpeta temp
+     c. Ejecuta batch script que:
+        - Cierra app actual
+        - Reemplaza .exe antiguo con nuevo
+        - Ejecuta app nueva
+
+ARCHIVOS RELACIONADOS
+---------------------
+- updater.py - Lógica de actualización
+- version.json - Versión actual
+- update_helper.bat - Script para reemplazar archivo
+
+CONFIGURACION
+-------------
+En Configuración → Admin, el usuario técnico puede:
+- Cambiar URL de versión.json en GitHub
+- Forzar verificación de actualización
+
+PERSISTENCIA
+-----------
+La URL se guarda en: %LOCALAPPDATA%\TECHCRM\config.json
+Usando ConfigManager para persistencia entre sesiones
+
+================================================================================
+10. COMPILACION Y DEPLOYMENT
+================================================================================
+
+COMPILAR A .EXE
+---------------
+Desde la carpeta del proyecto:
+
+    pyinstaller main.spec --clean
+
+Esto genera:
+    - dist/main.exe (compilado)
+    - build/ (temporal)
+
+RENOMBRAR
+---------
+    Move-Item -Path "dist/main.exe" -Destination "dist/TECHCRM-POS.exe" -Force
+
+PROBAR LOCALMENTE
+-----------------
+1. Hacer doble clic en dist/TECHCRM-POS.exe
+2. Verificar que funciona correctamente
+3. Hacer clic en menus para verificar carga de pantallas
+
+SUBIR A GITHUB
+--------------
+    git add .
+    git commit -m "v1.X - Descripción"
+    git push origin main
+
+CREAR RELEASE EN GITHUB
+-----------------------
+1. GitHub.com → Releases → Create new release
+2. Tag: v1.X
+3. Title: TECHCRM-POS v1.X
+4. Description: Cambios realizados
+5. Attach: dist/TECHCRM-POS.exe
+6. Publish
+
+COPIAR URL DE DESCARGA
+----------------------
+GitHub proporciona:
+    https://github.com/serhioSH/techcrm/releases/download/v1.X/TECHCRM-POS.exe
+
+ACTUALIZAR version.json
+-----------------------
+{
+  "version": "1.X",
+  "download_url": "https://github.com/.../download/v1.X/TECHCRM-POS.exe",
+  "release_date": "YYYY-MM-DD",
+  "description": "..."
+}
+
+    git add version.json
+    git commit -m "Update version to 1.X"
+    git push origin main
+
+================================================================================
+11. TROUBLESHOOTING
+================================================================================
+
+PROBLEMA: "ModuleNotFoundError: No module named 'app.ui.screens'"
+------------------------------------------------------------------
+SOLUCION:
+- Asegúrate que app/ui/screens/ tiene __init__.py
+- Verifica main.spec incluye 'app.ui.screens' en hiddenimports
+- Recompila: pyinstaller main.spec --clean
+
+PROBLEMA: Base de datos corrupta
+---------------------------------
+SOLUCION:
+- Elimina crm_system.db de %LOCALAPPDATA%\TECHCRM\
+- Al reiniciar, la app recrea la DB desde migrations.py
+- Alterna: restaurar desde backup en backups/
+
+PROBLEMA: Impresora no imprime
+-------------------------------
+SOLUCION:
+- Verifica que la impresora está conectada
+- En Configuración, verifica que está seleccionada
+- Prueba con comando de prueba en printer_manager.py
+
+PROBLEMA: Cambios en código no aparecen en .exe compilado
+----------------------------------------------------------
+SOLUCION:
+- Asegúrate de haber hecho: git add . && git push
+- Recompila: pyinstaller main.spec --clean
+- Espera a que termine (puede tomar 1-2 minutos)
+- Prueba el nuevo .exe
+
+PROBLEMA: Usuarios no ven actualización disponible
+---------------------------------------------------------
+SOLUCION:
+- Verifica que version.json está en GitHub (rama main)
+- En navegador: https://raw.githubusercontent.com/.../version.json
+- Debe devolver JSON (no error 404)
+- En app, ve a Configuración y verifica URL de actualización
+- Espera 5-10 minutos (caché de GitHub)
+
+PROBLEMA: App se cuelga al cargar pantalla
+-------------------------------------------
+SOLUCION:
+- Mira logs: %LOCALAPPDATA%\TECHCRM\logs\app.log
+- Busca errores cerca de la carga
+- Verifica que servicio correspondiente no tiene errores
+- Prueba mode desarrollo: python main.py
+
+================================================================================
+12. PROXIMAS MEJORAS
+================================================================================
+
+CORTO PLAZO (Próximas 2 semanas)
+- Agregar soporte multi-moneda
+- Mejorar reporte de inventario
+- Agregar tipos de descuento configurables
+
+MEDIANO PLAZO (Próximo mes)
+- Sistema de cliente/delivery
+- Integración con WhatsApp para notificaciones
+- App móvil para meseros
+- Sincronización en la nube (opcional)
+
+LARGO PLAZO
+- Multi-sucursal con consolidación
+- Analytics avanzado con BI
+- Integración con contabilidad
+- Sistema de lealtad de clientes
+
+================================================================================
+
+CONTACTO Y SOPORTE
+------------------
+Repositorio: https://github.com/serhioSH/techcrm
+Issues: Reporta problemas en GitHub Issues
+Documentación: Ver README.md y ACTUALIZACION.md
+
+LICENCIA
+--------
+Licencia de Tech Pixel C
+Desarrollado por: Tech Pixel
+Año: 2026
+
+================================================================================
+FIN DE GUIA DE DESARROLLO
+================================================================================
+Documento generado: 23/09/2026
+Version: 1.0
+Estado: COMPLETO Y OPERATIVO
