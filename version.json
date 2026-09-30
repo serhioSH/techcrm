@@ -1,6 +1,6 @@
 {
-  "version": "1.0.3",
-  "download_url": "https://github.com/serhioSH/techcrm/releases/download/v1.0.3/TECHCRM-POS.exe",
+  "version": "1.0.4",
+  "download_url": "https://github.com/serhioSH/techcrm/releases/download/v1.0.4/TECHCRM-POS.exe",
   "release_date": "2026-09-30",
-  "description": "v1.0.3 - Test de actualización automática - GEMINIS"
+  "description": "v1.0.4 - Fix: Diálogo de actualización aparece correctamente"
 }

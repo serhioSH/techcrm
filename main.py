@@ -27,20 +27,13 @@ def main():
     """Función principal de inicio de la aplicación."""
     logger = configurar_logger()
     logger.info("Iniciando POS Comidas Rápidas...")
-    
-    # PASO 1: Verificar actualizaciones
-    logger.info("Verificando actualizaciones...")
-    if not check_and_update_with_dialog():
-        # Si retorna False, la app debe cerrarse para actualizar
-        logger.info("Actualización en progreso. Cerrando aplicación.")
-        sys.exit(0)
 
-    # PASO 2: Inicializar base de datos (crear tablas si no existen)
+    # PASO 1: Inicializar base de datos (crear tablas si no existen)
     db = DatabaseConnection()
     inicializar_base_de_datos(db)
     logger.info("Base de datos inicializada correctamente.")
 
-    # PASO 3: Ejecutar seeder SOLO si la BD está vacía
+    # PASO 2: Ejecutar seeder SOLO si la BD está vacía
     if not ya_fue_inicializado(db):
         resultado = ejecutar_seeder(db)
         logger.info(
@@ -67,11 +60,18 @@ def main():
                     db.rollback()
         logger.info("Usuarios técnicos actualizados.")
 
-    # PASO 4: Iniciar aplicación Qt
+    # PASO 3: Iniciar aplicación Qt PRIMERO (antes de verificar actualizaciones)
     app = QApplication(sys.argv)
     app.setApplicationName("POS Comidas Rápidas")
     app.setOrganizationName("MiNegocio")
     app.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+
+    # PASO 4: Verificar actualizaciones (AHORA que QApplication existe)
+    logger.info("Verificando actualizaciones...")
+    if not check_and_update_with_dialog():
+        # Si retorna False, la app debe cerrarse para actualizar
+        logger.info("Actualización en progreso. Cerrando aplicación.")
+        sys.exit(0)
 
     # PASO 5: Mostrar ventana de login
     ventana_login = LoginWindow(db)
