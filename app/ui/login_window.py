@@ -34,7 +34,7 @@ class LoginWindow(QWidget):
         layout.setContentsMargins(50, 40, 50, 40)
 
         # Titulo
-        lbl_titulo = QLabel("🍔 POS COMIDAS")
+        lbl_titulo = QLabel("GEMINIS")
         lbl_titulo.setObjectName("titulo")
         lbl_titulo.setAlignment(Qt.AlignCenter)
         layout.addWidget(lbl_titulo)
